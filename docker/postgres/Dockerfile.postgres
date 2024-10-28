@@ -1,0 +1,16 @@
+# Uses the official PostgreSQL image as a base
+FROM postgres:latest
+
+# Sets environment variables
+ENV POSTGRES_DB=delivery
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres_password
+
+# Copies initialization scripts (if any) to the container
+COPY ./postgres-init /docker-entrypoint-initdb.d/
+
+# Exposes the PostgreSQL port
+EXPOSE 5432
+
+# Sets the default command to run PostgreSQL
+CMD ["postgres"]

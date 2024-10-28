@@ -1,0 +1,117 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "region": "{{env `AWS_REGION`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "{{user `region`}}",
+    "source_ami": "ami-***",
+    "instance_type": "t2.small",
+    "ssh_username": "ubuntu",
+    "ami_name": "packer-ubuntu-ami-{{timestamp}}"
+  }],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./scripts/install.sh",
+      "destination": "/home/ubuntu/install.sh"
+    },
+    {
+      "type": "file",
+      "source": "./scripts/every_min_dump.sh",
+      "destination": "/home/ubuntu/every_min_dump.sh"
+    },
+    {
+      "type": "file",
+      "source": "./scripts/every_minute_modsec_dump.sh",
+      "destination": "/home/ubuntu/every_minute_modsec_dump.sh"
+    },
+    {
+      "type": "file",
+      "source": "./scripts/every_minute_modsec_dump_parsed.py",
+      "destination": "/home/ubuntu/every_minute_modsec_dump_parsed.py"
+    },
+    {
+      "type": "file",
+      "source": "./configs/jail.local",
+      "destination": "/home/ubuntu/jail.local"
+    },
+    {
+      "type": "file",
+      "source": "./scripts/update_nginx_conf.sh",
+      "destination": "/home/ubuntu/update_nginx_conf.sh"
+    },
+    {
+      "type": "file",
+      "source": "./scripts/update_nginx_conf.sh",
+      "destination": "/home/ubuntu/update_nginx_conf_after_ecr_pull.sh"
+    },     
+    {
+      "type": "file",
+      "source": "./docker/docker-compose-dev.yml",
+      "destination": "/home/ubuntu/docker-compose.yml"
+    },
+    {
+      "type": "file",
+      "source": "./docker/certs",
+      "destination": "/home/ubuntu/certs"
+    },
+    {
+      "type": "file",
+      "source": "./docker/geoip_db",
+      "destination": "/home/ubuntu/geoip_db"
+    },
+    {
+      "type": "file",
+      "source": "./docker/libmodsecurity",
+      "destination": "/home/ubuntu/libmodsecurity"
+    },
+    {
+      "type": "file",
+      "source": "./docker/postgres-init",
+      "destination": "/home/ubuntu/postgres-init"
+    },
+    {
+      "type": "file",
+      "source": "./docker/postgres",
+      "destination": "/home/ubuntu/postgres"
+    },
+    {
+      "type": "file",
+      "source": "./docker/frontend",
+      "destination": "/home/ubuntu/frontend"
+    },
+    {
+      "type": "file",
+      "source": "./docker/Dockerfile.nginx",
+      "destination": "/home/ubuntu/Dockerfile.nginx"
+    },
+    {
+      "type": "file",
+      "source": "./docker/nginx.conf",
+      "destination": "/home/ubuntu/nginx.conf"
+    },
+    {
+      "type": "file",
+      "source": "./docker/default.conf",
+      "destination": "/home/ubuntu/default.conf"
+    },
+    {
+      "type": "file",
+      "source": "./allowed_aws_regional_ips.txt",
+      "destination": "/home/ubuntu/allowed_aws_regional_ips.txt"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "chmod +x /home/ubuntu/install.sh",
+        "chmod +x /home/ubuntu/update_nginx_conf.sh",
+        "chmod +x /home/ubuntu/update_nginx_conf_after_ecr_pull.sh"
+      ]
+    }  
+  ]
+}

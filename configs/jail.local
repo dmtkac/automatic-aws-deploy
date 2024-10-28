@@ -1,0 +1,58 @@
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1 {{YOUR_IP}} 3.120.181.40/29 16.63.77.8/29 13.48.4.200/30 15.161.135.164/30 18.101.90.48/29 18.202.216.48/29 3.8.37.24/29 35.180.112.80/29 18.206.107.24/29 3.16.146.0/29 13.52.6.112/29 18.237.140.160/29 18.252.4.0/30 15.200.28.80/30 35.183.92.176/29
+
+[nginx-botsearch]
+enabled = true
+filter = nginx-botsearch
+logpath = /home/ubuntu/web_app-gateway-1_logs.log
+maxretry = 2
+findtime = 60
+bantime = 86400
+
+[php-url-fopen]
+enabled = true
+filter = php-url-fopen
+logpath = /home/ubuntu/web_app-gateway-1_logs.log
+maxretry = 2
+findtime = 60
+bantime = 86400
+
+[phpmyadmin-syslog]
+enabled = true
+filter = phpmyadmin-syslog
+logpath = /home/ubuntu/web_app-gateway-1_logs.log
+maxretry = 2
+findtime = 60
+bantime = 86400
+
+[recidive]
+enabled = true
+filter = recidive
+logpath = /var/log/fail2ban.log
+maxretry = 2
+findtime = 600
+bantime = 604800
+
+[pam-generic]
+enabled = true
+filter = pam-generic
+logpath = /var/log/auth.log
+maxretry = 2
+findtime = 60
+bantime = 86400
+
+[nginx-limit-req]
+enabled = true
+filter = nginx-limit-req
+logpath = /home/ubuntu/web_app-gateway-1_logs.log
+maxretry = 30
+findtime = 60
+bantime = 600
+
+[modsecurity]
+enabled = true
+filter = modsecurity
+logpath = /home/ubuntu/modsec_audit_parsed.log
+maxretry = 1
+findtime = 10
+bantime = 86400
