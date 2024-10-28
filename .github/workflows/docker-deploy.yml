@@ -1,0 +1,406 @@
+name: Build and Deploy Docker to AWS ECR
+
+on:
+  push:
+    branches:
+      - main-configured
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      REPO_NAME: ${{ secrets.REPO_NAME }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Log in to AWS ECR
+      run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com 2>/dev/null
+
+    - name: Check AWS ECR repository existence
+      run: |
+        echo "Checking if ECR repository exists..."
+        EXISTING_REPO=$(aws ecr describe-repositories --repository-names "$REPO_NAME" --region "$AWS_REGION" --query "repositories[0].repositoryName" --output text || echo "NOT_FOUND")
+        if [ "$EXISTING_REPO" == "NOT_FOUND" ]; then
+          echo "The ECR repository does not exist. Exiting gracefully as planned."
+          echo "ecr_repo_exists=false" >> $GITHUB_ENV
+        else
+          echo "ECR repository found: $EXISTING_REPO"
+          echo "ecr_repo_exists=true" >> $GITHUB_ENV
+        fi 
+
+    - name: Exit if AWS ECR repository does not exist
+      if: ${{ env.ecr_repo_exists == 'false' }}
+      run: |
+        echo "ECR repository does not exist. Exiting the workflow gracefully."
+        exit 0
+
+    - name: Detect changed files
+      if: ${{ env.ecr_repo_exists == 'true' }}
+      run: |
+        echo "Fetching and comparing commit changes..."
+
+        # Checks if there's more than one commit
+        if [ $(git rev-list --count HEAD) -eq 1 ]; then
+          echo "This is the first commit. Skipping the build detection."
+          echo "build_frontend=false" >> $GITHUB_ENV
+          echo "build_gateway=false" >> $GITHUB_ENV
+          echo "build_postgres=false" >> $GITHUB_ENV
+          exit 0
+        fi
+
+        # Proceeds with detecting changes if it's not the first commit
+        git fetch origin main-configured
+        CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+        echo "Changed files detected: $CHANGED_FILES"
+        
+        # Initializes build flags
+        build_frontend=false
+        build_gateway=false
+        build_postgres=false
+        
+        # Checks if there are any changes
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "No changes detected!"
+          echo "build_frontend=false" >> $GITHUB_ENV
+          echo "build_gateway=false" >> $GITHUB_ENV
+          echo "build_postgres=false" >> $GITHUB_ENV
+        else
+          while IFS= read -r file; do
+            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/frontend/|^cypress/|^.eslintrc.json|^jest.config.js ]]; then
+              build_frontend=true
+            fi
+            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/Dockerfile.nginx|^docker/nginx.conf|^docker/default.conf|^docker/libmodsecurity/ ]]; then
+              build_gateway=true
+            fi
+            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/postgres-init/|^docker/postgres/|^docker/test_db.sql ]]; then
+              build_postgres=true
+            fi
+          done <<< "$CHANGED_FILES"
+          
+          # Exports build flags based on detected changes
+          echo "build_frontend=$build_frontend" >> $GITHUB_ENV
+          echo "build_gateway=$build_gateway" >> $GITHUB_ENV
+          echo "build_postgres=$build_postgres" >> $GITHUB_ENV
+        fi    
+
+    - name: Create .env file for Docker Compose
+      if: ${{ env.ecr_repo_exists == 'true' && (env.build_frontend == 'true' || env.build_gateway == 'true' || env.build_postgres == 'true') }}
+      run: |
+        echo "Creating .env file with necessary variables..."
+        ENV_FILE=docker/.env
+        
+        # Defines and saves AWS-related environment variables to the .env file and GitHub environment
+        {
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}"
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}"
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        } | tee -a $ENV_FILE >> $GITHUB_ENV
+
+        # Fetches the dynamically generated S3 bucket name
+        S3_BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'web-app-bucket')].Name" --output text)
+
+        if [[ -z "$S3_BUCKET_NAME" ]]; then
+          echo "Error: No S3 bucket found. Ensure the bucket exists and is named correctly."
+          exit 1
+        else
+          echo "S3_BUCKET_NAME=$S3_BUCKET_NAME" | tee -a $ENV_FILE >> $GITHUB_ENV
+          echo "S3 bucket '$S3_BUCKET_NAME' found."
+        fi
+  
+    - name: Install Docker Compose
+      if: ${{ env.ecr_repo_exists == 'true' && (env.build_frontend == 'true' || env.build_gateway == 'true' || env.build_postgres == 'true') }}
+      run: |
+        echo "Installing Docker Compose..."
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose --version
+  
+    - name: Set up Docker Buildx
+      if: ${{ env.ecr_repo_exists == 'true' && (env.build_frontend == 'true' || env.build_gateway == 'true' || env.build_postgres == 'true') }}
+      uses: docker/setup-buildx-action@v3
+
+    - name: Set up Node.js for 'frontend' container
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Clean Node modules and reinstall
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: |
+        rm -rf node_modules
+        npm cache clean --force
+        npm install --loglevel warn > npm-deprecated.log 2>&1
+      working-directory: docker/frontend
+
+    - name: Install dependencies for 'frontend' container
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: npm install
+
+      working-directory: docker/frontend
+
+    - name: Upload npm deprecated warnings log (if any)
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-jest-deprecated-warnings
+        path: docker/frontend/npm-deprecated.log
+
+    - name: Run ESLint on 'frontend' source code
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      continue-on-error: true 
+      run: |
+        echo "Running ESLint with auto-fix..."
+        npx eslint . --fix -f stylish > eslint-report.txt || {
+          echo "ESLint found errors that couldn't be automatically fixed.";
+          cat eslint-report.txt;
+        }      
+      working-directory: docker/frontend
+    
+    - name: Upload ESLint report (if exists)
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: eslint-report
+        path: docker/frontend/eslint-report.txt
+
+    - name: Run Jest unit tests on 'frontend' source code
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: |
+        NODE_ENV=test npm test -- --coverage --outputFile=docker/frontend/jest-report.txt
+      working-directory: docker/frontend
+
+    - name: Install Cypress code coverage dependencies for 'frontend' source code
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: npm install --save-dev @cypress/code-coverage istanbul nyc --loglevel warn > npm-cypress-deprecated.log 2>&1
+      working-directory: cypress
+
+    - name: Upload Cypress npm deprecated warnings log (if any)
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-cypress-deprecated-warnings
+        path: cypress/npm-cypress-deprecated.log
+        
+    - name: Start Cypress test server
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: |
+        set -e
+        NODE_ENV=test npm run start -- --port 3000 &
+        echo "cypress_server_started=true" >> $GITHUB_ENV
+      working-directory: docker/frontend 
+  
+    - name: Run Cypress tests on 'frontend' source code
+      if: ${{ env.cypress_server_started == 'true' }}
+      run: |
+        echo "Running Cypress end-to-end tests on port $PORT"
+        if ! npx cypress run; then
+          echo "Error: Cypress end-to-end tests failed."
+          exit 1
+        fi
+      working-directory: cypress
+
+    - name: Stop Cypress test server
+      if: ${{ env.cypress_server_started == 'true' }}
+      run: |
+        PORT_IN_USE=$(lsof -i :3000 | grep LISTEN | awk '{print $2}')
+        if [ -n "$PORT_IN_USE" ]; then
+          echo "Port 3000 is in use by PID $PORT_IN_USE. Stopping it..."
+          kill -9 $PORT_IN_USE
+        else
+          echo "Port 3000 is free."
+        fi  
+      working-directory: docker/frontend       
+
+    - name: Conditionally build, test, and push 'postgres' container
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_postgres == 'true' }}
+      run: |
+        echo "Building and pushing the postgres container..."
+    
+        # Creates a temporary build context for Postgres
+        echo "Creating temporary build context for Postgres..."
+        chmod u+w docker/
+        mkdir -p docker/postgres-build-context
+        cp -r docker/postgres-init/ docker/postgres-build-context/
+        cp -r docker/postgres/* docker/postgres-build-context/
+
+        # Checks if Dockerfile.postgres exists
+        if [ -f docker/postgres-build-context/Dockerfile.postgres ]; then
+          echo "Dockerfile.postgres found in docker/postgres-build-context"
+        else
+          echo "Dockerfile.postgres not found in docker/postgres-build-context"
+          exit 1
+        fi
+    
+        # Builds the Postgres container using the correct Dockerfile
+        echo "Building the Postgres container..."
+        if ! docker build -t "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:postgres" -f docker/postgres-build-context/Dockerfile.postgres docker/postgres-build-context; then
+          echo "Error: Failed to build the Postgres container."
+          exit 1
+        fi
+    
+        # Starts the container for verification
+        echo "Starting the Postgres container for verification..."        
+        if ! docker-compose -f docker/docker-compose-dev.yml up -d postgres; then
+          echo "Error: Failed to start the Postgres container."
+          docker-compose logs postgres
+          exit 1
+        fi      
+
+        # Runs Postgres integration tests
+        echo "Running Postgres integration test..."
+        
+        # Checks if the Postgres container is running
+        if ! docker ps | grep -q "web_app-postgres-1"; then
+          echo "Error: Postgres container is not running."
+          exit 1
+        else
+          echo "Postgres container is running. Checking database readiness..."
+        fi
+        
+        # Waits for PostgreSQL to be ready with a timeout
+        TIMEOUT=60
+        INTERVAL=2
+        TIMER=0
+
+        while ! docker exec web_app-postgres-1 pg_isready --host=localhost --port=5432; do
+          if [ "$TIMER" -ge "$TIMEOUT" ]; then
+            echo "Error: PostgreSQL did not become ready in time."
+            exit 1
+          fi
+          echo "Waiting for PostgreSQL..."
+          sleep $INTERVAL
+          TIMER=$((TIMER+INTERVAL))
+        done
+      
+        # Mount the test_db.sql into the container and run pg-tap tests
+        echo "PostgreSQL is ready, running database tests..."
+        if ! docker cp docker/test_db.sql web_app-postgres-1:/test_db.sql; then
+          echo "Error: Failed to copy test_db.sql to the container."
+          exit 1
+        fi
+        
+        # Run pg-tap tests
+        if docker exec web_app-postgres-1 psql --host=localhost --port=5432 --username=postgres --dbname=sample -f /test_db.sql; then
+          echo "PostgreSQL tests passed successfully."
+        else
+          echo "Error: PostgreSQL tests failed."
+          exit 1
+        fi
+
+        # Pushes the built Postgres image to AWS ECR
+        echo "Pushing the Postgres image to AWS ECR..."
+        if ! docker push "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:postgres"; then
+          echo "Error: Failed to push the Postgres image to AWS ECR."
+          exit 1
+        fi
+    
+        # Stops and removes the Postgres container
+        echo "Stopping and removing the Postgres container..."
+        docker-compose -f docker/docker-compose-dev.yml stop postgres
+        docker-compose -f docker/docker-compose-dev.yml rm -f postgres    
+    
+        # Cleans up temporary build context
+        echo "Cleaning up temporary build context..."
+        rm -rf docker/postgres-build-context 
+
+    - name: Conditionally build, test, and push 'frontend' container
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_frontend == 'true' }}
+      run: |
+        echo "Building and pushing the frontend container..."
+
+        # Checks if Dockerfile.dev exists
+        if [ -f docker/frontend/Dockerfile.dev ]; then
+          echo "Dockerfile.dev found in docker/frontend"
+        else
+          echo "Dockerfile.dev not found in docker/frontend"
+          exit 1
+        fi
+    
+        # Builds the frontend container
+        echo "Building the frontend container..."
+        if ! docker build -t "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:frontend" -f docker/frontend/Dockerfile.dev docker/frontend; then
+          echo "Error: Failed to build the frontend container."
+          exit 1
+        fi
+    
+        # Starts the container for verification
+        echo "Starting the frontend container for verification..."
+        if ! docker-compose -f docker/docker-compose-dev.yml up -d frontend; then
+          echo "Error: Failed to start the frontend container."
+          docker-compose logs frontend
+          exit 1
+        fi
+        
+        # Pushes the image to AWS ECR
+        echo "Pushing the frontend image to AWS ECR..."
+        if ! docker push "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:frontend"; then
+          echo "Error: Failed to push the frontend image to AWS ECR."
+          exit 1
+        fi   
+
+        # Stops and removes the frontend container
+        echo "Stopping and removing the frontend container..."
+        docker-compose -f docker/docker-compose-dev.yml stop frontend
+        docker-compose -f docker/docker-compose-dev.yml rm -f frontend        
+        
+    - name: Conditionally build and push 'gateway' container
+      if: ${{ env.ecr_repo_exists == 'true' && env.build_gateway == 'true' }}
+      working-directory: docker
+      run: |    
+        # Checks if Dockerfile.nginx exists
+        if [ -f Dockerfile.nginx ]; then
+          echo "Dockerfile.nginx found in docker"
+        else
+          echo "Dockerfile.nginx not found in docker"
+          exit 1
+        fi
+
+        echo "Building the gateway container..."
+        # Builds the gateway container
+        if ! docker build -t "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:gateway" -f Dockerfile.nginx .; then
+          echo "Error: Failed to build the gateway container."
+          exit 1
+        fi
+    
+        # Starts the container for verification
+        echo "Starting the gateway container for verification..."
+        if ! docker-compose -f docker-compose-dev.yml up -d gateway; then
+          echo "Error: Failed to start the gateway container."
+          docker-compose logs gateway
+          exit 1
+        fi        
+       
+        # Pushes the built gateway image to AWS ECR
+        echo "Pushing the gateway image to AWS ECR..."
+        if ! docker push "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPO_NAME }}:gateway"; then
+          echo "Error: Failed to push the gateway image to AWS ECR."
+          exit 1
+        fi    
+    
+        # Stops and removes the gateway container
+        echo "Stopping and removing the gateway container..."
+        docker-compose -f docker-compose-dev.yml stop gateway
+        docker-compose -f docker-compose-dev.yml rm -f gateway 
+
+    - name: Clean up Docker resources
+      if: always()
+      run: |
+        echo "Cleaning up Docker resources..."
+        docker system prune -f --volumes
