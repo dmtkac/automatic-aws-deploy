@@ -29,4 +29,6 @@ override.tf.json
 
 # Ignores txt files
 *.txt
-!jest-report.txt # Except for this file
+# Except for these files
+!jest-report.txt
+!LICENSE.txt

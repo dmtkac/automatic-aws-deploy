@@ -545,23 +545,19 @@ The 'gateway' container is verified within the GitHub Actions workflow and teste
 - In GitHub Actions workflow update to the latest versions all deprecated modules (if any).
 
 ## Licensing
-This work is licensed under a Creative Commons Attribution 4.0 International License ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)).
+This work is licensed under the GNU General Public License v3.0 ([GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)).
 
-- Share — copy and redistribute the material in any medium or format;
-- Adapt — remix, transform, and build upon the material.
+- You are free to use, modify, and distribute this software, as long as any modified versions are also distributed under the same GPL license.
+- You must give appropriate credit to the original author.
+- This software is distributed without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.
 
-This license requires that reusers give credit to the creator. It allows reusers to distribute, remix, adapt, and build upon the material in any medium or format, for noncommercial purposes only. If others modify or adapt the material, they must license the modified material under identical terms.
+For the full terms, see the [LICENSE](./LICENSE.txt) file in this repository or visit [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
 
-![Creative Commons License](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)
+![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
 
 ## Support this project
 If you enjoyed this project or found it useful, consider supporting me! Your donations help me to maintain and develop future improvements.
 
 [![Donate with PayPal button](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?hosted_button_id=WWVH67M22965A)
 
-Or donate with cryptocurrency:
-
-- USDT (ERC 20): 0xe3D7779204d2746Be0159a1f8D9f4899dB42946d
-- BTC: bc1q3wjcf6vdzn2zcakfu0e2ykaqdncg3uqpra76fc
-- ETH (ERC 20): 0xe3D7779204d2746Be0159a1f8D9f4899dB42946d
-- TRX: TASKBFhb1oarxrNcaUsnaRCn2jxJoHxHYa
+[![Donate with Crypto](https://img.shields.io/badge/Donate%20with-Crypto-green?style=flat-square&logo=bitcoin)](./qr_crypto.png)
