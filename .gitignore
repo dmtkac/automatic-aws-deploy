@@ -1,0 +1,32 @@
+# Ignores local .terraform directories
+**/.terraform/*
+terraform/.terraform.lock.hcl
+
+# Ignores .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Ignores crash log files
+crash.log
+
+# Ignores override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignores generated plan files
+*.tfplan
+
+# Ignores log files
+*.log
+
+# Ignores ssh key
+/key/*
+
+# Ignores proprietary GeoIP MaxMind database file
+/docker/geoip_db/*
+
+# Ignores txt files
+*.txt
+!jest-report.txt # Except for this file

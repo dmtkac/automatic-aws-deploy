@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated test</title>
+  <link rel="shortcut icon" type="image/x-icon" href="images/favicon.png" />
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/themify-icons/0.1.2/css/themify-icons.css">
+  <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="loading-indicator-container">
+    <div id="loading-indicator" class="spinner"></div>
+    <div id="loading-text" class="loading-text">Generating test...</div>
+  </div>
+  <div id="content-container" class="content-container">
+    <div id="quiz-container" style="display:none;"></div>
+    <div class="button-container" style="display:none;">
+      <button id="check-button" disabled>Check ⧖</button>
+      <button id="refresh-button" style="display:none;">New test ⟳</button>
+    </div>
+  </div>
+
+  <div class="scroll-top-to">
+    <i class="ti-angle-up"></i>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const quizContainer = document.getElementById('quiz-container');
+      const checkButton = document.getElementById('check-button');
+      const refreshButton = document.getElementById('refresh-button');
+      const loadingIndicator = document.getElementById('loading-indicator');
+      const loadingText = document.getElementById('loading-text');
+      const buttonContainer = document.querySelector('.button-container');
+      const contentContainer = document.getElementById('content-container');
+      const loadingIndicatorContainer = document.getElementById('loading-indicator-container');
+      let questions = [];
+
+      async function fetchQuestions() {
+        try {
+          const response = await fetch('/api/questions', {
+            credentials: 'include',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+          if (response.status === 429) {
+            const message = await response.text();
+            alert(message);
+            return;
+          }
+          questions = await response.json();
+          await renderQuestions();
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub, quizContainer, () => {
+            loadingIndicatorContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+            buttonContainer.style.display = 'flex';
+            resetState();
+          }]);
+        } catch (error) {
+          console.error('Error fetching questions:', error);
+        }
+      }
+
+      async function fetchImage(imageName) {
+        try {
+          const response = await fetch(`/api/illustration/${imageName}`, {
+            credentials: 'include',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+          
+          if (response.status === 429) {
+            throw new Error(await response.text());
+          }
+          
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          
+          const blob = await response.blob();
+          return URL.createObjectURL(blob);
+        } catch (error) {
+          console.error('Error fetching image:', error);
+          return '';
+        }
+      }
+
+      async function renderQuestions() {
+        quizContainer.style.display = 'none';
+        loadingIndicatorContainer.style.display = 'flex';
+        buttonContainer.style.display = 'none';
+        quizContainer.innerHTML = '';
+        for (const question of questions) {
+          const questionDiv = document.createElement('div');
+          questionDiv.classList.add('question');
+          let questionText = question.Text.trim();
+
+          if (questionText.includes('.png')) {
+            const imageName = questionText.split(' ').pop();
+            const imageUrl = await fetchImage(imageName);
+            questionText = questionText.replace(imageName, `<img src="${imageUrl}" alt="${imageName}" style="display: block; margin: 0 auto;" />`);
+          }
+
+          questionDiv.innerHTML = `
+            <h4>${questionText}</h4>
+            <div class="options grid-container">
+              ${await renderOptions(question.options, question.MultipleCorrectAnswersAllowed, question.Id)}
+            </div>
+          `;
+          quizContainer.appendChild(questionDiv);
+        }
+
+        const inputs = quizContainer.querySelectorAll('input');
+        inputs.forEach(input => {
+          input.addEventListener('change', handleInputChange);
+        });
+      }
+
+      async function renderOptions(options, multipleCorrectAnswersAllowed, questionId) {
+        return Promise.all(options.map(async option => {
+          let optionText = option.Text;
+          if (optionText.includes('.png')) {
+            const imageName = optionText.split(' ').pop();
+            const imageUrl = await fetchImage(imageName);
+            optionText = optionText.replace(imageName, `<img src="${imageUrl}" alt="${imageName}" style="display: block; margin: 0 auto;" />`);
+          }
+
+          return `
+            <label class="grid-item" for="${option.Id}">
+              <input type="${multipleCorrectAnswersAllowed ? 'checkbox' : 'radio'}" name="question${questionId}" id="${option.Id}" value="${option.Id}">
+              <span class="option-text">${optionText}</span>
+            </label>
+          `;
+        })).then(renderedOptions => renderedOptions.join(''));
+      }
+
+      function handleInputChange() {
+        const allAnswered = Array.from(quizContainer.querySelectorAll('.question')).every(questionDiv => {
+          const inputs = questionDiv.querySelectorAll('input');
+          return Array.from(inputs).some(input => input.checked);
+        });
+        checkButton.disabled = !allAnswered;
+      }
+
+      checkButton.addEventListener('click', async () => {
+        const userAnswers = [];
+        questions.forEach((question, index) => {
+          const inputs = document.getElementsByName(`question${question.Id}`);
+          inputs.forEach(input => {
+            if (input.checked) {
+              userAnswers.push({
+                questionId: question.Id,
+                answerId: input.value
+              });
+            }
+          });
+        });
+
+        try {
+          const response = await fetch('/api/check-answers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ answers: userAnswers })
+          });
+
+          if (response.status === 429) {
+            throw new Error(await response.text());
+          }
+
+          const result = await response.json();
+          displayResults(result);
+        } catch (error) {
+          console.error('Error verifying answers:', error);
+          alert(error.message);
+        }
+      });
+
+      function displayResults(result) {
+        result.forEach(res => {
+          const inputs = document.getElementsByName(`question${res.questionId}`);
+          inputs.forEach(input => {
+            const parentLabel = input.closest('label');
+            parentLabel.classList.remove('highlight', 'correct', 'not-answered');
+            if (res.correctAnswers.includes(input.value)) {
+              if (input.checked) {
+                parentLabel.classList.add('correct');
+              }
+            } else if (input.checked) {
+              parentLabel.classList.add('highlight');
+            }
+          });
+        });
+
+        checkButton.style.display = 'none';
+        refreshButton.style.display = 'block';
+      }
+
+      refreshButton.addEventListener('click', () => {
+        fetchQuestions();
+      });
+
+      function resetState() {
+        checkButton.disabled = true;
+        checkButton.style.display = 'block';
+        refreshButton.style.display = 'none';
+      }
+
+      fetchQuestions();
+
+      // Disable F5 and context menu
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'F5') {
+          e.preventDefault();
+        }
+        if ((e.ctrlKey && e.key === 'c') || (e.metaKey && e.key === 'c')) {
+          e.preventDefault();
+        }
+      });
+
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      });
+    });
+
+    $(document).ready(function() {
+      $(window).scroll(function() {
+        if ($(this).scrollTop() > 100) {
+          $('.scroll-top-to').fadeIn();
+        } else {
+          $('..scroll-top-to').fadeOut();
+        }
+      });
+
+      $('.scroll-top-to').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 600);
+        return false;
+      });
+    });
+  </script>
+</body>
+</html>

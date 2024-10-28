@@ -1,0 +1,122 @@
+# Uses nginx:alpine as the base image for smaller size
+FROM nginx:alpine AS builder
+
+# Sets the version of Nginx and modules
+ARG NGINX_VERSION=1.25.4
+ARG MODSECURITY_VERSION=3.0.12
+ARG GEOIP2_VERSION=3.4
+
+# Installs dependencies for building Nginx with GeoIP2 and ModSecurity modules
+RUN apk add --no-cache --virtual .build-deps \
+    build-base \
+    linux-headers \
+    openssl-dev \
+    pcre-dev \
+    zlib-dev \
+    libmaxminddb-dev \
+    git \
+    wget \
+    autoconf \
+    automake \
+    libtool
+
+# Downloads and compiles ModSecurity
+RUN git clone --depth 1 -b v${MODSECURITY_VERSION} https://github.com/SpiderLabs/ModSecurity.git /usr/src/modsecurity \
+    && cd /usr/src/modsecurity \
+    && git submodule init \
+    && git submodule update \
+    && ./build.sh \
+    && ./configure \
+    && make \
+    && make install
+
+# Downloads and compiles the ModSecurity-nginx connector
+RUN git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git /usr/src/modsecurity-nginx
+
+# Downloads and unpacks Nginx
+RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
+    && tar zxvf nginx-${NGINX_VERSION}.tar.gz \
+    && git clone https://github.com/leev/ngx_http_geoip2_module.git
+
+# Compiles Nginx with additional modules
+WORKDIR /nginx-${NGINX_VERSION}
+RUN ./configure --prefix=/etc/nginx \
+                --sbin-path=/usr/sbin/nginx \
+                --modules-path=/usr/lib/nginx/modules \
+                --conf-path=/etc/nginx/nginx.conf \
+                --error-log-path=/var/log/nginx/error.log \
+                --http-log-path=/var/log/nginx/access.log \
+                --pid-path=/var/run/nginx.pid \
+                --lock-path=/var/run/nginx.lock \
+                --http-client-body-temp-path=/var/cache/nginx/client_temp \
+                --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+                --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+                --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+                --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+                --user=nginx \
+                --group=nginx \
+                --with-compat \
+                --with-file-aio \
+                --with-threads \
+                --with-http_addition_module \
+                --with-http_auth_request_module \
+                --with-http_dav_module \
+                --with-http_flv_module \
+                --with-http_gunzip_module \
+                --with-http_gzip_static_module \
+                --with-http_mp4_module \
+                --with-http_random_index_module \
+                --with-http_realip_module \
+                --with-http_secure_link_module \
+                --with-http_slice_module \
+                --with-http_ssl_module \
+                --with-http_stub_status_module \
+                --with-http_sub_module \
+                --with-http_v2_module \
+                --with-http_v3_module \
+                --with-mail \
+                --with-mail_ssl_module \
+                --with-stream \
+                --with-stream_realip_module \
+                --with-stream_ssl_module \
+                --with-stream_ssl_preread_module \
+                --add-dynamic-module=/usr/src/modsecurity-nginx \
+                --add-dynamic-module=/ngx_http_geoip2_module \
+    && make modules \
+    && make install
+
+# Starts a new stage for the final image
+FROM nginx:alpine
+
+# Installs runtime dependencies
+RUN apk add --no-cache pcre libstdc++ libmaxminddb
+
+# Copies the compiled Nginx binary and modules from the builder stage
+COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder /etc/nginx /etc/nginx
+COPY --from=builder /usr/lib/nginx/modules /usr/lib/nginx/modules
+COPY --from=builder /usr/local/modsecurity /usr/local/modsecurity
+
+# Copies Nginx configuration files
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY ./geoip_db/GeoLite2-Country.mmdb /etc/nginx/geoip/GeoLite2-Country.mmdb
+
+# Copies ModSecurity configuration files and rules
+COPY ./libmodsecurity/modsecurity.conf /etc/nginx/modsec/modsecurity.conf
+COPY ./libmodsecurity/crs-setup.conf /etc/nginx/modsec/crs-setup.conf
+COPY ./libmodsecurity/rules/ /etc/nginx/modsec/rules/
+COPY ./libmodsecurity/unicode.mapping /etc/nginx/modsec/unicode.mapping
+
+# Copies SSL certificates (if any)
+COPY ./certs /etc/nginx/certs
+
+# Forwards request logs to Docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+# Exposes ports
+EXPOSE 80 443
+
+# Starts Nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,20 @@
+FROM node:alpine
+
+USER node
+
+RUN mkdir -p /home/node/app
+WORKDIR /home/node/app
+
+COPY --chown=node:node ./package.json .
+
+# Installs production dependencies
+RUN npm install pg aws-sdk helmet morgan cors express-rate-limit --loglevel warn > /dev/null 2>&1
+
+# Installs development dependencies
+RUN npm install --save-dev jest supertest cypress @cypress/code-coverage babel-jest @babel/preset-env babel-plugin-istanbul
+
+COPY --chown=node:node ./ ./
+
+EXPOSE 3000
+
+CMD [ "node", "server.js" ]
