@@ -24,11 +24,11 @@ override.tf.json
 # Ignores ssh key
 /key/*
 
-# Ignores proprietary GeoIP MaxMind database file
-/docker/geoip_db/*
-
 # Ignores txt files
 *.txt
 # Except for these files
 !jest-report.txt
 !LICENSE.txt
+
+# Ignores MaxMind GeoIP db files
+*.mmdb

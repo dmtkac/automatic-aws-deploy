@@ -13,6 +13,7 @@
     - [configs](#configs)
     - [cypress](#cypress)
     - [docker](#docker)
+    - [prometheus/loki/grafana](#Monitoring-stack)
     - [illustrations](#illustrations)
     - [key](#key)
     - [packer](#packer)
@@ -33,6 +34,7 @@
 - [CI/CD pipeline](#CICD-pipeline)
   - [1st part (GitHub Actions)](#GitHub-Actions-workflow)
   - [2nd part (EC2)](#ec2-part-of-workflow)
+- [Monitoring stack](#Monitoring-stack)
 - [Testing](#Testing)
     - ['frontend' container testing](#frontend-container-testing)
         - [Raw code syntax check (ESLint)](#Raw-code-syntax-check-ESLint)
@@ -75,6 +77,16 @@ The web app posseses [adaptive interface](./docker/frontend/public/styles.css) a
 
 <p align="center"><i>Image 1. Interface of web app</i></p>
 
+### Monitoring
+[Monitoring stack](#Monitoring-stack) of this project comprises wide variety of services, such as Prometheus, Loki, Process Exporter, Postgres Exporter and Prom-client combined with Grafana's dashboard capabilities.
+
+![Monitoring stack](./docker/monitoring_stack/screenshots/2-quick_server_grafana_panels.png)
+![Monitoring stack](./docker/monitoring_stack/screenshots/3-server_logs_grafana_panels.png)
+
+<p align="center"><i>Image 2. Monitoring stack</i></p>
+
+[More screenshots](#monitoring-stack)
+
 ### Prerequisites
 - AWS account with programmatic access and required policies (AmazonEC2FullAccess, AmazonS3FullAccess, etc.);
 - GitHub Action Secrets configured for automated deployment (AWS credentials, ECR repository, etc.);
@@ -83,13 +95,22 @@ The web app posseses [adaptive interface](./docker/frontend/public/styles.css) a
 Run either of [deploy scripts](#root-level-files) for details.
 
 ### Architecture
-- 2 EC2 instances (Ubuntu) with Docker installed, hosting:
-  - Nginx reverse proxy
-  - Node.js web application
-  - PostgreSQL database
+- 2 EC2 instances (Ubuntu) with Docker installed
 - S3 bucket for storing application assets
 - Elastic Load Balancer for traffic distribution
 - (Optional) Elastic Container Registry (ECR), Route 53, and Amazon Certificate Manager for domain name and SSL management
+
+Web app:
+  - Nginx reverse proxy
+  - Node.js web application
+  - PostgreSQL database
+
+Monitoring:
+  - Telegraf/Prometheus/Grafana pipeline for monitoring server's metrics
+  - Process_exporter/Prometheus/Grafana pipeline for monitoring server's processes
+  - Postgres_exporter/Prometheus/Grafana pipeline for monitoring PostgreSQL database
+  - Prom-client/Prometheus/Grafana pipeline for monitoring Node.js metrics
+  - Custom 'Log_pusher'/Loki/Grafana pipeline for monitoring server's logs
 
 ### Technical stack
 - Infrastructure:
@@ -99,7 +120,7 @@ Run either of [deploy scripts](#root-level-files) for details.
   - [GitHub Actions](#GitHub-Actions-CICD-workflow)
   - [Bash](./deploy.sh)
   - [PowerShell](./deploy.ps1)
-  - [Python](./scripts/every_minute_modsec_dump_parsed.py)
+  - Python: [1: log parser](./scripts/every_minute_modsec_dump_parsed.py); [2: log pusher service for Loki](./docker/monitoring_stack/log_pusher/push_logs.py)
 
 - Security:
   - WAF ([ModSecurity](./docker/nginx.conf/), [Fail2ban](./configs/jail.local))
@@ -117,6 +138,14 @@ Run either of [deploy scripts](#root-level-files) for details.
   - [Node.js](./docker/frontend/server.js)
   - [Express.js](./docker/frontend/server.js)
   - [PostgreSQL](./docker/postgres-init/Sample.sql)
+
+- Monitoring
+  - [Grafana](./docker/monitoring_stack/grafana/)
+  - [Prometheus](./docker/monitoring_stack/prometheus.yml)
+  - [Telegraf](./docker/monitoring_stack/telegraf.conf)
+  - [Process exporter](./docker/monitoring_stack/process_exporter_config.yml)
+  - [Loki](./docker/monitoring_stack/loki/loki-config.yml)
+  - [Custom log pusher for Loki](./docker/monitoring_stack/log_pusher/push_logs.py)
 
 - Testing:
   - [Jest](#integration-testing-jest)
@@ -192,6 +221,9 @@ graph TD
         VF1[Database: Postgres]
         VF1 <--> VF2[Frontend: Node.js]
         VF2 <--> VF3[Gateway: Nginx]
+        VF1 <--> VF4[Monitoring  stack]
+        VF2 <--> VF4[Monitoring  stack]
+        VF3 <--> VF4[Monitoring  stack]
     end
     V10 -.-> VC1
     
@@ -199,6 +231,9 @@ graph TD
         VF1A[Database: Postgres]
         VF1A <--> VF2A[Frontend: Node.js]
         VF2A <--> VF3A[Gateway: Nginx]
+        VF1A <--> VF4A[Monitoring  stack]
+        VF2A <--> VF4A[Monitoring  stack]
+        VF3A <--> VF4A[Monitoring  stack]
     end
     VA10 -.-> VC2
 
@@ -219,7 +254,7 @@ graph TD
     Z -- No --> AD[Use Dedicated Script Later]
     AD --> ADA[Exit Script]
 ```
-<p align="center"><i>Image 2. General deploying algorithm</i></p>
+<p align="center"><i>Image 3. General deploying algorithm</i></p>
 
 ## Detailed autorun of '[install.sh](./scripts/install.sh)' (EC2 part)
 
@@ -246,11 +281,12 @@ graph TD;
     P --> Q[Add 'ubuntu' user to Docker group]
 
     Q --> R{Check for AWS ECR}
-    R -- No AWS ECR found --> W
+    R -- No AWS ECR found --> U1
     R -- AWS ECR found --> S2[Login to AWS ECR]
 
     S2 --> U[Set up cron jobs for Docker containers' updates]
-    U --> W[Run Nginx config update script]
+    U --> U1[Preparing directories for Loki and Log pusher]
+    U1 --> W[Run Nginx config update script]
     W --> X[Build and start Docker containers with Docker Compose]
     X --> Y[Set Docker containers to restart on reboot]
 
@@ -279,7 +315,7 @@ graph TD;
     AN --> AP
 ```
 
-<p align="center"><i>Image 3. Detailed autorun of 'install.sh' (EC2 part)</i></p>
+<p align="center"><i>Image 4. Detailed autorun of 'install.sh' (EC2 part)</i></p>
 
 ## Project's directories and files
 ### .github/workflows
@@ -297,8 +333,8 @@ graph TD;
   - [cypress.config.js](./cypress/cypress.config.js): cypress configuration file that manages test setup, plugins, and environment configurations.
 
 ### docker
+- [certs](./docker/certs/): placeholder directory that gets populated with a self-signed certificate and key on each provisioned EC2 instance if no custom domain is provided during the local deployment phase. If a custom domain is specified, the custom certificate and key are uploaded to AWS Certificate Manager (ACM) during the local phase of deployment from the user's machine;
 - [frontend](./docker/frontend/): contains the frontend source code and tests:
-  - [certs](./docker/certs/): placeholder directory that gets populated with a self-signed certificate and key on each provisioned EC2 instance if no custom domain is provided during the local deployment phase. If a custom domain is specified, the custom certificate and key are uploaded to AWS Certificate Manager (ACM) during the local phase of deployment from the user's machine;
   - [tests](./docker/frontend/__tests__): integration tests run by Jest:
     - [server.test.js](./docker/frontend/__tests__/server.test.js): integration testing of the backend API; fetches and validates questions and their options, verifies the existence of illustrations;
     - [illustrations.json](./docker/frontend/__tests__/illustrations.json): a list of illustration filenames used for verifying the existence of specific images within the [illustrations](./illustrations/) folder during tests;
@@ -309,9 +345,18 @@ graph TD;
   - [server.js](./docker/frontend/server.js): backend server logic for serving the frontend or handling API requests;
 - [geoip_db](./docker/geoip_db/): this directory should contain proprietary GeoLite2 IP country-level database '.mmdb' from MaxMind; you can register there and get your copy of database with follow up updates for free;
 - [libmodsecurity](./docker/libmodsecurity/): holds ModSecurity-related files for web application firewall (WAF) setup;
+- [monitoring_stack] (./docker/monitoring_stack/): contains configuration files for Telegraf, Prometheus, custom Log_pusher written in Python, Loki, EC2 Process exporter and Grafana's dashboards:
+  - [grafana/provisioning](./docker/monitoring_stack/grafana/provisioning/): 'dashboard' contains config and layout files for the main dashboard itself and 'datasources' contains input soruces (Prometheus, Loki);
+  - [grafana/grafana.ini](./docker/monitoring_stack/grafana/grafana.ini): ini-file for auxiliary functions, such as thresholds and sending alerts based on them;
+  - [log_pusher](./docker/monitoring_stack/grafana/log_pusher/): contains Dockerfile for buidling the custom service that works with logs and the actual app written in Python, which uses Loki's ability to intake logs via its API;
+  - [loki](./docker/monitoring_stack/grafana/loki/): configuration files for Loki database - Dockerfile for building container, configuration YAML file, entrypoint shell script for assigning correct permissions to important structural directories within the service;
+  - [screenshots](./docker/monitoring_stack/screenshots/): screenshots of Grafana's dashboard in action;
+  - [process_exporter_config.yml](./docker/monitoring_stack/process_exporter_config.yml): config file for scraping AWS EC2 processes' metrics (e.g., CPU and RAM usage);
+  - [prometheus.yml](./docker/monitoring_stack/prometheus.yml): config file for Prometheus database;
+  - [telegraf.conf](./docker/monitoring_stack/telegraf.conf): config file for Prometheus' service agent that scrapes system metrics on AWS EC2; 
 - [postgres](./docker/postgres/): contains Dockerfile for building the 'postgres' container;
 - [postgres-init](./docker/postgres-init/): contains 40 questions demo 'Sample' database for setting up the 'postgres' container;
-- [docker-compose-dev.yml](./docker/docker-compose-dev.yml): Docker Compose file for running the multi-container development environment;
+- [docker-compose.yml](./docker/docker-compose.yml): Docker Compose file for running the multi-container development environment;
 - [Dockerfile.nginx](./docker/Dockerfile.nginx): Dockerfile for setting up the 'gateway' container for serving 'frontend' and reverse proxy;
 - [nginx.conf](./docker/nginx.conf): Nginx configuration file with server and proxy settings;
 - [test_db.sql](./docker/test_db.sql): set of SQL commands for testing the database schema and validating 'Sample' database's content.
@@ -401,6 +446,51 @@ Contains additional utility scripts for managing deployed infrastructure:
 ### Outputs
 ([file](./terraform/output.tf))
 - captures and outputs important details such as the ALB DNS name, instance IDs, instance public IPs, and the dynamically generated S3 bucket name. This information is used for configuration and deployment steps.
+
+## Monitoring stack
+([directory](./docker/monitoring_stack/))
+
+Monitoring stack of this project comprises wide variety of services, such as Prometheus, Loki, Process Exporter, Postgres Exporter and Prom-client combined with Grafana's dashboard capabilities. Overall there are 7 logical sub-dashboards:
+
+![All sub-dashboards collapsed](./docker/monitoring_stack/screenshots/1-all_collapsed_grafana_panels.png)
+
+<p align="center"><i>Image 5. All sub-dashboards collapsed</i></p>
+
+![Quick server vitals](./docker/monitoring_stack/screenshots/2-quick_server_grafana_panels.png)
+
+<p align="center"><i>Image 6. Quick server vitals</i></p>
+
+![Gateway logs with geographical mapping, syslog and Fail2ban logs](./docker/monitoring_stack/screenshots/3-server_logs_grafana_panels.png)
+
+<p align="center"><i>Image 7. Gateway logs with geographical mapping, syslog and Fail2ban logs</i></p>
+
+![Detailed server metrics over times](./docker/monitoring_stack/screenshots/4-detailed_server_grafana_panels.png)
+
+<p align="center"><i>Image 8. Detailed server metrics over time</i></p>
+
+![Detailed server logs](./docker/monitoring_stack/screenshots/5-server_logs_grafana_panels_2.png)
+
+<p align="center"><i>Image 9. Detailed server logs</i></p>
+
+![Detailed Docker metrics](./docker/monitoring_stack/screenshots/6-docker_grafana_panels.png)
+
+<p align="center"><i>Image 10. Detailed Docker metrics</i></p>
+
+![Detailed Docker metrics over time](./docker/monitoring_stack/screenshots/7-docker_grafana_panels_2.png)
+
+<p align="center"><i>Image 11. Detailed Docker metrics over time</i></p>
+
+![Detailed EC2 Disc IOPS](./docker/monitoring_stack/screenshots/8-disk_iops_grafana_panels.png)
+
+<p align="center"><i>Image 12. Detailed EC2 Disc IOPS</i></p>
+
+![Detailed PostgreSQL DB connections](./docker/monitoring_stack/screenshots/9-postgresql_grafana_panels.png)
+
+<p align="center"><i>Image 13. Detailed PostgreSQL DB connections</i></p>
+
+![Detailed Node.js metrics in web app](./docker/monitoring_stack/screenshots/10-webapp_grafana_panels.png)
+
+<p align="center"><i>Image 14. Detailed Node.js metrics in web app</i></p>
 
 ## CI/CD pipeline
 It consists of two parts:

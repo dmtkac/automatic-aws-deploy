@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'telegraf'
+    static_configs:
+      - targets: ['telegraf:9273']
+      
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres_exporter:9187']
+
+  - job_name: 'frontend'
+    static_configs:
+      - targets: ['frontend:3000']
+
+  - job_name: 'process'
+    static_configs:
+      - targets: ['process_exporter:9256']

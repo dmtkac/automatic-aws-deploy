@@ -52,7 +52,7 @@
     },     
     {
       "type": "file",
-      "source": "./docker/docker-compose-dev.yml",
+      "source": "./docker/docker-compose.yml",
       "destination": "/home/ubuntu/docker-compose.yml"
     },
     {
@@ -100,6 +100,66 @@
       "source": "./docker/default.conf",
       "destination": "/home/ubuntu/default.conf"
     },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/grafana/provisioning/dashboards/dashboards.yml",
+      "destination": "/home/ubuntu/monitoring_stack/grafana/provisioning/dashboards/dashboards.yml"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/grafana/provisioning/dashboards/System Monitoring Metrics.json",
+      "destination": "/home/ubuntu/monitoring_stack/grafana/provisioning/dashboards/System Monitoring Metrics.json"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/grafana/provisioning/datasources/datasources.yaml",
+      "destination": "/home/ubuntu/monitoring_stack/grafana/provisioning/datasources/datasources.yaml"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/grafana/grafana.ini",
+      "destination": "/home/ubuntu/monitoring_stack/grafana/grafana.ini"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/log_pusher/Dockerfile",
+      "destination": "/home/ubuntu/monitoring_stack/log_pusher/Dockerfile"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/log_pusher/Dockpush_logs.py",
+      "destination": "/home/ubuntu/monitoring_stack/log_pusher/push_logs.py"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/loki/Dockerfile",
+      "destination": "/home/ubuntu/monitoring_stack/loki/Dockerfile"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/loki/entrypoint.sh",
+      "destination": "/home/ubuntu/monitoring_stack/loki/entrypoint.sh"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/loki/loki-config.yml",
+      "destination": "/home/ubuntu/monitoring_stack/loki/loki-config.yml"
+    },
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/process_exporter_config.yml",
+      "destination": "/home/ubuntu/monitoring_stack/process_exporter_config.yml"
+    }, 
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/telegraf.conf",
+      "destination": "/home/ubuntu/monitoring_stack/telegraf.conf"
+    }, 
+    {
+      "type": "file",
+      "source": "./docker/monitoring_stack/prometheus.yml",
+      "destination": "/home/ubuntu/monitoring_stack/prometheus.yml"
+    },    
     {
       "type": "file",
       "source": "./allowed_aws_regional_ips.txt",

@@ -35,6 +35,12 @@ echo " * Updating and installing necessary packages..." | tee -a "$LOGFILE"
 log_command sudo apt-get update -y
 log_command sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common fail2ban python3 openssh-server iptables-persistent unzip ec2-instance-connect openssl
 
+# Installs npm needed for building 'frontend' container later
+echo ""
+echo " * Updating apt and installing npm..." | tee -a "$LOGFILE"
+log_command sudo apt-get update -y
+log_command sudo apt-get install -y npm
+
 # Installs AWS CLI
 echo ""
 echo " * Installing AWS CLI..." | tee -a "$LOGFILE"
@@ -191,13 +197,13 @@ if [ "$SKIP_ECR" = false ]; then
 
     (crontab -l 2>/dev/null; echo "
         # Cron job for postgres container
-        0 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:postgres && sudo docker rm -f web_app-postgres-1 || true && sudo docker run -d --name web_app-postgres-1 --network ubuntu_my-network --env-file /home/ubuntu/.env -p 9999:5432 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:postgres && sudo docker system prune --all --volumes --force | sudo tee -a /var/log/pipeline-docker-compose-postgres.log 2>&1
+        0 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:postgres && sudo docker rm -f postgres || true && sudo docker run -d --name postgres --network ubuntu_my-network --env-file /home/ubuntu/.env -p 9999:5432 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:postgres && sudo docker system prune --all --volumes --force | sudo tee -a /var/log/pipeline-docker-compose-postgres.log 2>&1
 
         # Cron job for frontend container
-        5 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:frontend && sudo docker rm -f web_app-frontend-1 || true && sudo docker run -d --name web_app-frontend-1 --network ubuntu_my-network --env-file /home/ubuntu/.env -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:frontend && sudo docker system prune --all --volumes --force | sudo tee -a /var/log/pipeline-docker-compose-frontend.log 2>&1
+        5 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:frontend && sudo docker rm -f frontend || true && sudo docker run -d --name frontend --network ubuntu_my-network --env-file /home/ubuntu/.env -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:frontend && sudo docker system prune --all --volumes --force | sudo tee -a /var/log/pipeline-docker-compose-frontend.log 2>&1
 
         # Cron job for gateway container
-        15 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway && sudo docker rm -f web_app-gateway-1 || true && sudo docker run -d --name web_app-gateway-1 --network ubuntu_my-network --env-file /home/ubuntu/.env -p 80:80 -p 443:443 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway && sudo docker system prune --all --volumes --force && sudo bash /home/ubuntu/update_nginx_conf_after_ecr_pull.sh | sudo tee -a /var/log/pipeline-docker-compose-gateway.log 2>&1
+        15 * * * * sudo docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway && sudo docker rm -f gateway || true && sudo docker run -d --name gateway --network ubuntu_my-network --env-file /home/ubuntu/.env -p 80:80 -p 443:443 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway && sudo docker system prune --all --volumes --force && sudo bash /home/ubuntu/update_nginx_conf_after_ecr_pull.sh | sudo tee -a /var/log/pipeline-docker-compose-gateway.log 2>&1
     ") | crontab -
 
     if [ $? -ne 0 ]; then
@@ -207,6 +213,34 @@ if [ "$SKIP_ECR" = false ]; then
         echo " + Pipeline cron job setup succeeded." | tee -a "$LOGFILE"
     fi
 fi
+
+# Extracts UID for 'ubuntu' user
+UBUNTU_UID=$(id -u ubuntu)
+
+# Extracts GID for group 'docker' with getent to lookup the group details
+DOCKER_GID=$(getent group docker | cut -d: -f3)
+
+echo "Using UID: $UBUNTU_UID and GID: $DOCKER_GID"
+
+# Defines the host directories that need to be present for persistent data
+LOKI_DATA_DIR="/home/ubuntu/monitoring_stack/loki/loki_data"
+LOG_PUSHER_STATE_DIR="/home/ubuntu/monitoring_stack/log_pusher/offsets"
+
+# Creates and assigns correct ownership to Loki data directory
+if [ ! -d "$LOKI_DATA_DIR" ]; then
+    echo "Creating Loki data directory: $LOKI_DATA_DIR"
+    sudo mkdir -p "$LOKI_DATA_DIR"
+fi
+echo "Setting ownership of Loki data directory to $UBUNTU_UID:$DOCKER_GID"
+sudo chown -R $UBUNTU_UID:$DOCKER_GID "$LOKI_DATA_DIR"
+
+# Creates and assigns correct ownership to Log Pusher offset directory
+if [ ! -d "$LOG_PUSHER_STATE_DIR" ]; then
+    echo "Creating Log Pusher state directory: $LOG_PUSHER_STATE_DIR"
+    sudo mkdir -p "$LOG_PUSHER_STATE_DIR"
+fi
+echo "Setting ownership of Log Pusher state directory to $UBUNTU_UID:$DOCKER_GID"
+sudo chown -R $UBUNTU_UID:$DOCKER_GID "$LOG_PUSHER_STATE_DIR"
 
 # Runs the nginx configuration update script
 echo ""
@@ -229,14 +263,14 @@ fi
 # Ensures Docker containers restart after reboot
 echo ""
 echo " * Ensuring Docker containers restart after reboot..." | tee -a "$LOGFILE"
-log_command sudo docker update --restart=always web_app-postgres-1
-log_command sudo docker update --restart=always web_app-gateway-1
-log_command sudo docker update --restart=always web_app-frontend-1
+log_command sudo docker update --restart=always postgres
+log_command sudo docker update --restart=always gateway
+log_command sudo docker update --restart=always frontend
 
 # Creates and sets permissions for the ModSecurity audit log file inside Docker
 echo ""
 echo " * Creating and setting permissions for the ModSecurity audit log file inside Docker..." | tee -a "$LOGFILE"
-log_command sudo docker exec web_app-gateway-1 /bin/sh -c "touch /var/log/modsec_audit.log && chown nginx:nginx /var/log/modsec_audit.log && chmod 660 /var/log/modsec_audit.log"
+log_command sudo docker exec gateway /bin/sh -c "touch /var/log/modsec_audit.log && chown nginx:nginx /var/log/modsec_audit.log && chmod 660 /var/log/modsec_audit.log"
 
 # Creates the scripts directory
 echo ""
@@ -271,9 +305,9 @@ echo " * Creating dummy log file for Fail2ban service..." | tee -a "$LOGFILE"
 log_command touch /home/ubuntu/modsec_audit_parsed.log
 log_command sudo chown root:root /home/ubuntu/modsec_audit_parsed.log
 log_command sudo chmod 660 /home/ubuntu/modsec_audit_parsed.log
-log_command touch /home/ubuntu/web_app-gateway-1_logs.log
-log_command sudo chown root:root /home/ubuntu/web_app-gateway-1_logs.log
-log_command sudo chmod 660 /home/ubuntu/web_app-gateway-1_logs.log
+log_command touch /home/ubuntu/gateway_logs.log
+log_command sudo chown root:root /home/ubuntu/gateway_logs.log
+log_command sudo chmod 660 /home/ubuntu/gateway_logs.log
 
 # Creates 'modsecurity' filter for jail.local
 echo ""

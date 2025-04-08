@@ -1,8 +1,8 @@
 #!/bin/bash
 
-LOG_FILE="/home/ubuntu/web_app-gateway-1_logs.log"
-OLD_LOG_FILE="/home/ubuntu/web_app-gateway-1_logs_old.log"
-MAX_SIZE=104857600 # 100 MB in bytes
+LOG_FILE="/home/ubuntu/gateway_logs.log"
+OLD_LOG_FILE="/home/ubuntu/gateway_logs_old.log"
+MAX_SIZE=10485760 # 10 MB in bytes
 LAST_DUMP_FILE="/home/ubuntu/last_dump_time.txt"
 
 # Get the last dump time, or use the current time if the file doesn't exist
@@ -13,7 +13,7 @@ else
 fi
 
 # Dumps logs into the log file
-docker logs web_app-gateway-1 --since "$LAST_DUMP_TIME" >> "$LOG_FILE"
+docker logs gateway --since "$LAST_DUMP_TIME" >> "$LOG_FILE"
 
 # Updates the last dump time
 date --iso-8601=seconds > "$LAST_DUMP_FILE"

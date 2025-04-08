@@ -12,14 +12,14 @@ if [ ! -f "$HOST_LOG_FILE" ]; then
 fi
 
 # Dumps the ModSecurity audit log from the Docker container to the host file
-docker exec web_app-gateway-1 cat $MODSEC_LOG_PATH >> $HOST_LOG_FILE
+docker exec gateway cat $MODSEC_LOG_PATH >> $HOST_LOG_FILE
 if [ $? -ne 0 ]; then
     echo "Failed to dump ModSecurity audit log."
     exit 1
 fi
 
 # Clears the audit log file inside the Docker container to avoid log buildup
-docker exec web_app-gateway-1 bash -c "echo '' > $MODSEC_LOG_PATH"
+docker exec gateway bash -c "echo '' > $MODSEC_LOG_PATH"
 if [ $? -ne 0 ]; then
     echo "Failed to clear ModSecurity audit log inside Docker."
     exit 1

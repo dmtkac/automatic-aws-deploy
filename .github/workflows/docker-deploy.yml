@@ -82,13 +82,13 @@ jobs:
           echo "build_postgres=false" >> $GITHUB_ENV
         else
           while IFS= read -r file; do
-            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/frontend/|^cypress/|^.eslintrc.json|^jest.config.js ]]; then
+            if [[ "$file" =~ ^docker/docker-compose.yml|^docker/frontend/|^cypress/|^.eslintrc.json|^jest.config.js ]]; then
               build_frontend=true
             fi
-            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/Dockerfile.nginx|^docker/nginx.conf|^docker/default.conf|^docker/libmodsecurity/ ]]; then
+            if [[ "$file" =~ ^docker/docker-compose.yml|^docker/Dockerfile.nginx|^docker/nginx.conf|^docker/default.conf|^docker/libmodsecurity/ ]]; then
               build_gateway=true
             fi
-            if [[ "$file" =~ ^docker/docker-compose-dev.yml|^docker/postgres-init/|^docker/postgres/|^docker/test_db.sql ]]; then
+            if [[ "$file" =~ ^docker/docker-compose.yml|^docker/postgres-init/|^docker/postgres/|^docker/test_db.sql ]]; then
               build_postgres=true
             fi
           done <<< "$CHANGED_FILES"
@@ -257,7 +257,7 @@ jobs:
     
         # Starts the container for verification
         echo "Starting the Postgres container for verification..."        
-        if ! docker-compose -f docker/docker-compose-dev.yml up -d postgres; then
+        if ! docker-compose -f docker/docker-compose.yml up -d postgres; then
           echo "Error: Failed to start the Postgres container."
           docker-compose logs postgres
           exit 1
@@ -313,8 +313,8 @@ jobs:
     
         # Stops and removes the Postgres container
         echo "Stopping and removing the Postgres container..."
-        docker-compose -f docker/docker-compose-dev.yml stop postgres
-        docker-compose -f docker/docker-compose-dev.yml rm -f postgres    
+        docker-compose -f docker/docker-compose.yml stop postgres
+        docker-compose -f docker/docker-compose.yml rm -f postgres    
     
         # Cleans up temporary build context
         echo "Cleaning up temporary build context..."
@@ -342,7 +342,7 @@ jobs:
     
         # Starts the container for verification
         echo "Starting the frontend container for verification..."
-        if ! docker-compose -f docker/docker-compose-dev.yml up -d frontend; then
+        if ! docker-compose -f docker/docker-compose.yml up -d frontend; then
           echo "Error: Failed to start the frontend container."
           docker-compose logs frontend
           exit 1
@@ -357,8 +357,8 @@ jobs:
 
         # Stops and removes the frontend container
         echo "Stopping and removing the frontend container..."
-        docker-compose -f docker/docker-compose-dev.yml stop frontend
-        docker-compose -f docker/docker-compose-dev.yml rm -f frontend        
+        docker-compose -f docker/docker-compose.yml stop frontend
+        docker-compose -f docker/docker-compose.yml rm -f frontend        
         
     - name: Conditionally build and push 'gateway' container
       if: ${{ env.ecr_repo_exists == 'true' && env.build_gateway == 'true' }}
@@ -381,7 +381,7 @@ jobs:
     
         # Starts the container for verification
         echo "Starting the gateway container for verification..."
-        if ! docker-compose -f docker-compose-dev.yml up -d gateway; then
+        if ! docker-compose -f docker-compose.yml up -d gateway; then
           echo "Error: Failed to start the gateway container."
           docker-compose logs gateway
           exit 1
@@ -396,8 +396,8 @@ jobs:
     
         # Stops and removes the gateway container
         echo "Stopping and removing the gateway container..."
-        docker-compose -f docker-compose-dev.yml stop gateway
-        docker-compose -f docker-compose-dev.yml rm -f gateway 
+        docker-compose -f docker-compose.yml stop gateway
+        docker-compose -f docker-compose.yml rm -f gateway 
 
     - name: Clean up Docker resources
       if: always()

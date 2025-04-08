@@ -7,13 +7,49 @@ const morgan = require('morgan');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
+//Metrics for monitoring HTTP requests
+// Prom-client
+const client = require('prom-client');
+
+// Registry
+const register = new client.Registry();
+register.setDefaultLabels({ app: 'server-en.js' });
+
+//Collecting of Node.js metrics
+client.collectDefaultMetrics({ register });
+
+// Histogram to track duration of HTTP requests
+const httpRequestDurationMs = new client.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [50, 100, 200, 300, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+});
+register.registerMetric(httpRequestDurationMs);
+
+// Counter for HTTP requests
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status_code']
+});
+register.registerMetric(httpRequestCounter);
+
+// Counter for HTTP error responses
+const httpErrorCounter = new client.Counter({
+  name: 'http_errors_total',
+  help: 'Total number of HTTP error responses',
+  labelNames: ['method', 'route', 'status_code']
+});
+register.registerMetric(httpErrorCounter);
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 // PostgreSQL pool setup with environment variables for configuration
 const pool = new Pool({
   user: process.env.PG_USER || 'postgres',
-  host: process.env.PG_HOST || 'web_app-postgres-1',
+  host: process.env.PG_HOST || 'postgres',
   database: process.env.PG_DATABASE || 'sample',
   password: process.env.PG_PASSWORD || 'postgres_password',
   port: process.env.PG_PORT || 5432,
@@ -26,6 +62,29 @@ const s3 = new AWS.S3({
   region: process.env.AWS_REGION
 });
 const bucketName = process.env.S3_BUCKET_NAME;
+
+// Middleware for recording Prometheus metrics
+app.use((req, res, next) => {
+  const startTime = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    const route = req.route && req.route.path ? req.route.path : req.path;
+    const method = req.method;
+    const status = res.statusCode;
+    httpRequestDurationMs.labels(method, route, status).observe(duration);
+    httpRequestCounter.labels(method, route, status).inc();
+    if (status >= 400) {
+      httpErrorCounter.labels(method, route, status).inc();
+    }
+  });
+  next();
+});
+
+// Exposing /metrics endpoint for Prometheus
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 // Middleware to store ban status
 const userBanStatus = new Map();

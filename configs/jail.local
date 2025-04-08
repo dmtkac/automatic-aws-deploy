@@ -4,7 +4,7 @@ ignoreip = 127.0.0.1/8 ::1 {{YOUR_IP}} 3.120.181.40/29 16.63.77.8/29 13.48.4.200
 [nginx-botsearch]
 enabled = true
 filter = nginx-botsearch
-logpath = /home/ubuntu/web_app-gateway-1_logs.log
+logpath = /home/ubuntu/gateway_logs.log
 maxretry = 2
 findtime = 60
 bantime = 86400
@@ -12,7 +12,7 @@ bantime = 86400
 [php-url-fopen]
 enabled = true
 filter = php-url-fopen
-logpath = /home/ubuntu/web_app-gateway-1_logs.log
+logpath = /home/ubuntu/gateway_logs.log
 maxretry = 2
 findtime = 60
 bantime = 86400
@@ -20,7 +20,7 @@ bantime = 86400
 [phpmyadmin-syslog]
 enabled = true
 filter = phpmyadmin-syslog
-logpath = /home/ubuntu/web_app-gateway-1_logs.log
+logpath = /home/ubuntu/gateway_logs.log
 maxretry = 2
 findtime = 60
 bantime = 86400
@@ -44,7 +44,7 @@ bantime = 86400
 [nginx-limit-req]
 enabled = true
 filter = nginx-limit-req
-logpath = /home/ubuntu/web_app-gateway-1_logs.log
+logpath = /home/ubuntu/gateway_logs.log
 maxretry = 30
 findtime = 60
 bantime = 600

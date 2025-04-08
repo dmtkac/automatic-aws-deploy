@@ -16,7 +16,7 @@ log_command() {
 # Function to extract nginx.conf from the running container
 extract_nginx_conf() {
     echo " * Extracting nginx.conf from the 'gateway' container..." | sudo tee -a "$LOGFILE"
-    sudo docker cp web_app-gateway-1:/etc/nginx/nginx.conf /home/ubuntu/nginx.conf
+    sudo docker cp gateway:/etc/nginx/nginx.conf /home/ubuntu/nginx.conf
     if [ $? -ne 0 ]; then
         echo " ! Failed to extract nginx.conf from the container." | sudo tee -a "$LOGFILE"
         exit 1
@@ -53,9 +53,9 @@ check_certificates() {
 # Function to copy the updated files back into the container
 copy_back_to_container() {
     echo " * Copying updated nginx.conf and certificates back to the container..." | sudo tee -a "$LOGFILE"
-    sudo docker cp /home/ubuntu/nginx.conf web_app-gateway-1:/etc/nginx/nginx.conf
-    sudo docker cp /home/ubuntu/certs/selfsigned.key web_app-gateway-1:/etc/nginx/certs/selfsigned.key
-    sudo docker cp /home/ubuntu/certs/selfsigned.crt web_app-gateway-1:/etc/nginx/certs/selfsigned.crt
+    sudo docker cp /home/ubuntu/nginx.conf gateway:/etc/nginx/nginx.conf
+    sudo docker cp /home/ubuntu/certs/selfsigned.key gateway:/etc/nginx/certs/selfsigned.key
+    sudo docker cp /home/ubuntu/certs/selfsigned.crt gateway:/etc/nginx/certs/selfsigned.crt
 
     if [ $? -ne 0 ]; then
         echo " ! Failed to copy updated files back to the container." | sudo tee -a "$LOGFILE"
@@ -68,8 +68,8 @@ copy_back_to_container() {
 # Function to restart the container
 restart_gateway_container() {
     echo " * Restarting the 'gateway' container..." | sudo tee -a "$LOGFILE"
-    sudo docker rm -f web_app-gateway-1 || true
-    sudo docker run -d --name web_app-gateway-1 --network ubuntu_my-network --env-file /home/ubuntu/.env -p 80:80 -p 443:443 "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway"
+    sudo docker rm -f gateway || true
+    sudo docker run -d --name gateway --network ubuntu_my-network --env-file /home/ubuntu/.env -p 80:80 -p 443:443 "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}:gateway"
     if [ $? -ne 0 ]; then
         echo " ! Failed to restart the 'gateway' container." | sudo tee -a "$LOGFILE"
         exit 1
@@ -84,9 +84,9 @@ run_tests() {
 
     # Nginx syntax test on the container
     echo "Testing Nginx configuration syntax..."
-    if ! sudo docker exec web_app-gateway-1 nginx -t 2>&1 | tee /dev/stderr | grep -q "syntax is ok"; then
+    if ! sudo docker exec gateway nginx -t 2>&1 | tee /dev/stderr | grep -q "syntax is ok"; then
         echo "Error: Nginx configuration test failed inside the container."
-        sudo docker logs web_app-gateway-1 || echo "No container logs available."
+        sudo docker logs gateway || echo "No container logs available."
         exit 1
     else
         echo "Nginx configuration syntax test passed."
