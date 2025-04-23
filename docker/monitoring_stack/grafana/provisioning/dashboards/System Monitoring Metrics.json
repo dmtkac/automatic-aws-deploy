@@ -15,7 +15,6 @@
       }
     ]
   },
-  "description": "Node exporter metrics of Validator node on Matic network",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -29,6 +28,586 @@
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "id": 394,
+      "panels": [],
+      "title": "Charges for AWS",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 35
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 3,
+        "x": 0,
+        "y": 1
+      },
+      "id": 395,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "timeFrom": "6h",
+      "title": "AWS charges (estimated)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 3,
+        "y": 1
+      },
+      "id": 393,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.7,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": true,
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "Value",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonEC2"
+          },
+          "expression": "",
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonVPC"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonS3"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonCloudWatch"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonSES"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "E",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "timeFrom": "6h",
+      "title": "AWS charges (current)",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "",
+            "binary": {
+              "left": {
+                "fixed": ""
+              },
+              "right": {
+                "fixed": ""
+              }
+            },
+            "mode": "unary",
+            "reduce": {
+              "include": [
+                "AmazonEC2",
+                "AmazonS3",
+                "AmazonCloudWatch",
+                "AmazonSES",
+                "AmazonVPC"
+              ],
+              "reducer": "sum"
+            },
+            "replaceFields": false,
+            "unary": {
+              "fieldName": "Time",
+              "operator": "abs"
+            }
+          }
+        },
+        {
+          "id": "formatTime",
+          "options": {
+            "outputFormat": "DD/MM/YYYY",
+            "timeField": "Time",
+            "useTimezone": true
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 40,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "log"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 396,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": true,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonEC2"
+          },
+          "expression": "",
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonVPC"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "B",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonS3"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "C",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonCloudWatch"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "D",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "Currency": "USD",
+            "ServiceName": "AmazonSES"
+          },
+          "expression": "",
+          "hide": false,
+          "id": "",
+          "label": "${PROP('Dim.ServiceName')}",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "EstimatedCharges",
+          "metricQueryType": 0,
+          "namespace": "AWS/Billing",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "E",
+          "region": "us-east-1",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "AWS charges (historical)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
       },
       "id": 261,
       "panels": [],
@@ -82,7 +661,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 1
+        "y": 10
       },
       "id": 20,
       "options": {
@@ -157,7 +736,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 1
+        "y": 10
       },
       "id": 16,
       "options": {
@@ -227,7 +806,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 1
+        "y": 10
       },
       "id": 316,
       "options": {
@@ -303,7 +882,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 1
+        "y": 10
       },
       "id": 15,
       "maxDataPoints": 100,
@@ -407,7 +986,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 1
+        "y": 10
       },
       "id": 325,
       "options": {
@@ -466,7 +1045,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 5
+        "y": 14
       },
       "id": 317,
       "options": {
@@ -530,7 +1109,7 @@
         "h": 4,
         "w": 4,
         "x": 4,
-        "y": 5
+        "y": 14
       },
       "id": 154,
       "options": {
@@ -594,7 +1173,7 @@
         "h": 4,
         "w": 4,
         "x": 8,
-        "y": 5
+        "y": 14
       },
       "id": 319,
       "options": {
@@ -658,7 +1237,7 @@
         "h": 4,
         "w": 4,
         "x": 12,
-        "y": 5
+        "y": 14
       },
       "id": 346,
       "options": {
@@ -761,7 +1340,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 5
+        "y": 14
       },
       "id": 326,
       "options": {
@@ -824,7 +1403,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 18
       },
       "id": 367,
       "options": {
@@ -940,7 +1519,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 18
       },
       "id": 368,
       "options": {
@@ -977,6 +1556,19 @@
       "type": "timeseries"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 398,
+      "panels": [],
+      "title": "Critical server logs",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "loki",
         "uid": "P8E80F9AEF21F6940"
@@ -989,7 +1581,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 22
+        "y": 32
       },
       "id": 363,
       "options": {
@@ -1163,7 +1755,7 @@
         "h": 12,
         "w": 12,
         "x": 12,
-        "y": 22
+        "y": 32
       },
       "id": 364,
       "options": {
@@ -1346,9 +1938,9 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 44
       },
-      "id": 365,
+      "id": 366,
       "options": {
         "dedupStrategy": "none",
         "enableInfiniteScrolling": false,
@@ -1369,12 +1961,12 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"syslog\"}",
+          "expr": "{service_name=\"auth\"}",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Syslog",
+      "title": "Auth.log",
       "transparent": true,
       "type": "logs"
     },
@@ -1391,7 +1983,7 @@
         "h": 12,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 44
       },
       "id": 373,
       "options": {
@@ -1424,12 +2016,1127 @@
       "type": "logs"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 374,
+      "panels": [],
+      "title": "S3 bucket security vitals",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP DELETE requests made for objects in an Amazon S3 bucket. This metric also includes DeleteObjects requests. This metric shows the number of requests made, not the number of objects deleted.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 57
+      },
+      "id": 377,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "DeleteRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "title": "All S3 Bucket DELETE Requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP PUT requests made for objects in an Amazon S3 bucket. This metric is incremented for the destination of each CopyObject request.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 57
+      },
+      "id": 376,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "PutRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "title": "All S3 Bucket PUT Requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of bytes uploaded for requests made to an Amazon S3 bucket, where the request includes a body.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 65
+      },
+      "id": 382,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "BytesUploaded",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "title": "Uploaded to S3 Bucket",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP POST requests made to an Amazon S3 bucket. Note: DeleteObjects and SelectObjectContent requests are not included in this metric.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 65
+      },
+      "id": 378,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "PostRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "title": "All S3 Bucket POST Requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1. The Average statistic shows the error rate, and the Sum statistic shows the count of that type of error, during each period.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 73
+      },
+      "id": 386,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "4xxErrors",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Average S3 Bucket 4xx Errors Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1. The Average statistic shows the error rate, and the Sum statistic shows the count of that type of error, during each period.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 73
+      },
+      "id": 387,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "5xxErrors",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Average S3 Bucket 5xx Errors Count",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 81
+      },
+      "id": 388,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "FirstByteLatency",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Average S3 Bucket First Byte Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket. This metric includes the time taken to receive the request body and send the response body, which is not included in FirstByteLatency.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 81
+      },
+      "id": 389,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "TotalRequestLatency",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Average"
+        }
+      ],
+      "title": "Average S3 Bucket Request Latency",
+      "type": "timeseries"
+    },
+    {
       "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 46
+        "y": 89
+      },
+      "id": 369,
+      "panels": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 0,
+            "y": 90
+          },
+          "id": 365,
+          "options": {
+            "dedupStrategy": "none",
+            "enableInfiniteScrolling": false,
+            "enableLogDetails": false,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{service_name=\"syslog\"}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Syslog",
+          "transparent": true,
+          "type": "logs"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 12,
+            "y": 90
+          },
+          "id": 372,
+          "options": {
+            "dedupStrategy": "none",
+            "enableInfiniteScrolling": false,
+            "enableLogDetails": false,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{service_name=\"dpkg\"}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Dpkg.log",
+          "transparent": true,
+          "type": "logs"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 0,
+            "y": 102
+          },
+          "id": 370,
+          "options": {
+            "dedupStrategy": "none",
+            "enableInfiniteScrolling": false,
+            "enableLogDetails": false,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{service_name=\"cookie\"}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "Webapp Cookie Consent",
+          "transparent": true,
+          "type": "logs"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 12,
+            "x": 12,
+            "y": 102
+          },
+          "id": 371,
+          "options": {
+            "dedupStrategy": "none",
+            "enableInfiniteScrolling": false,
+            "enableLogDetails": false,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": false,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "P8E80F9AEF21F6940"
+              },
+              "direction": "backward",
+              "editorMode": "code",
+              "expr": "{service_name=\"geoip2\"}",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "MaxMind GeoIP2 DB",
+          "transparent": true,
+          "type": "logs"
+        }
+      ],
+      "title": "Detailed server logs",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 90
       },
       "id": 321,
       "panels": [
@@ -1517,7 +3224,7 @@
             "h": 6,
             "w": 8,
             "x": 0,
-            "y": 47
+            "y": 218
           },
           "id": 322,
           "options": {
@@ -1636,7 +3343,7 @@
             "h": 6,
             "w": 8,
             "x": 8,
-            "y": 47
+            "y": 218
           },
           "id": 323,
           "options": {
@@ -1755,7 +3462,7 @@
             "h": 6,
             "w": 8,
             "x": 16,
-            "y": 47
+            "y": 218
           },
           "id": 324,
           "options": {
@@ -1875,7 +3582,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 77
+            "y": 256
           },
           "id": 155,
           "options": {
@@ -1995,7 +3702,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 77
+            "y": 256
           },
           "id": 320,
           "options": {
@@ -2031,201 +3738,7 @@
           "type": "timeseries"
         }
       ],
-      "title": "Detailed server vitals",
-      "type": "row"
-    },
-    {
-      "collapsed": true,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 47
-      },
-      "id": 369,
-      "panels": [
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "P8E80F9AEF21F6940"
-          },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 12,
-            "w": 12,
-            "x": 0,
-            "y": 48
-          },
-          "id": 372,
-          "options": {
-            "dedupStrategy": "none",
-            "enableInfiniteScrolling": false,
-            "enableLogDetails": false,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": false,
-            "sortOrder": "Descending",
-            "wrapLogMessage": true
-          },
-          "pluginVersion": "11.6.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "loki",
-                "uid": "P8E80F9AEF21F6940"
-              },
-              "direction": "backward",
-              "editorMode": "code",
-              "expr": "{service_name=\"dpkg\"}",
-              "queryType": "range",
-              "refId": "A"
-            }
-          ],
-          "title": "Dpkg.log",
-          "transparent": true,
-          "type": "logs"
-        },
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "P8E80F9AEF21F6940"
-          },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 12,
-            "w": 12,
-            "x": 12,
-            "y": 48
-          },
-          "id": 366,
-          "options": {
-            "dedupStrategy": "none",
-            "enableInfiniteScrolling": false,
-            "enableLogDetails": false,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": false,
-            "sortOrder": "Descending",
-            "wrapLogMessage": true
-          },
-          "pluginVersion": "11.6.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "loki",
-                "uid": "P8E80F9AEF21F6940"
-              },
-              "direction": "backward",
-              "editorMode": "code",
-              "expr": "{service_name=\"auth\"}",
-              "queryType": "range",
-              "refId": "A"
-            }
-          ],
-          "title": "Auth.log",
-          "transparent": true,
-          "type": "logs"
-        },
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "P8E80F9AEF21F6940"
-          },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 12,
-            "w": 12,
-            "x": 0,
-            "y": 60
-          },
-          "id": 370,
-          "options": {
-            "dedupStrategy": "none",
-            "enableInfiniteScrolling": false,
-            "enableLogDetails": false,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": false,
-            "sortOrder": "Descending",
-            "wrapLogMessage": true
-          },
-          "pluginVersion": "11.6.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "loki",
-                "uid": "P8E80F9AEF21F6940"
-              },
-              "direction": "backward",
-              "editorMode": "code",
-              "expr": "{service_name=\"cookie\"}",
-              "queryType": "range",
-              "refId": "A"
-            }
-          ],
-          "title": "Webapp Cookie Consent",
-          "transparent": true,
-          "type": "logs"
-        },
-        {
-          "datasource": {
-            "type": "loki",
-            "uid": "P8E80F9AEF21F6940"
-          },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 12,
-            "w": 12,
-            "x": 12,
-            "y": 60
-          },
-          "id": 371,
-          "options": {
-            "dedupStrategy": "none",
-            "enableInfiniteScrolling": false,
-            "enableLogDetails": false,
-            "prettifyLogMessage": false,
-            "showCommonLabels": false,
-            "showLabels": false,
-            "showTime": false,
-            "sortOrder": "Descending",
-            "wrapLogMessage": true
-          },
-          "pluginVersion": "11.6.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "loki",
-                "uid": "P8E80F9AEF21F6940"
-              },
-              "direction": "backward",
-              "editorMode": "code",
-              "expr": "{service_name=\"geoip2\"}",
-              "queryType": "range",
-              "refId": "A"
-            }
-          ],
-          "title": "MaxMind GeoIP2 DB",
-          "transparent": true,
-          "type": "logs"
-        }
-      ],
-      "title": "Detailed server logs",
+      "title": "Historical server vitals",
       "type": "row"
     },
     {
@@ -2234,11 +3747,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 91
       },
       "id": 327,
       "panels": [],
-      "title": "Detailed Docker vitals",
+      "title": "Historical Docker vitals",
       "type": "row"
     },
     {
@@ -2290,7 +3803,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 49
+        "y": 92
       },
       "id": 334,
       "options": {
@@ -2378,7 +3891,7 @@
         "h": 5,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 97
       },
       "id": 335,
       "options": {
@@ -2484,7 +3997,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 59
+        "y": 102
       },
       "id": 328,
       "options": {
@@ -2510,7 +4023,7 @@
           "refId": "A"
         }
       ],
-      "title": "CPU Usage",
+      "title": "Containers' CPU Usage",
       "type": "timeseries"
     },
     {
@@ -2579,7 +4092,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 113
       },
       "id": 329,
       "options": {
@@ -2605,7 +4118,7 @@
           "refId": "A"
         }
       ],
-      "title": "Memory Usage",
+      "title": "Containers' Memory Usage",
       "type": "timeseries"
     },
     {
@@ -2673,7 +4186,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 81
+        "y": 124
       },
       "id": 330,
       "options": {
@@ -2699,7 +4212,7 @@
           "refId": "A"
         }
       ],
-      "title": "Disk I/O – Read",
+      "title": "Containers' Disk I/O – Read",
       "type": "timeseries"
     },
     {
@@ -2767,7 +4280,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 92
+        "y": 135
       },
       "id": 331,
       "options": {
@@ -2793,7 +4306,7 @@
           "refId": "A"
         }
       ],
-      "title": "Disk I/O – Write",
+      "title": "Containers' Disk I/O – Write",
       "type": "timeseries"
     },
     {
@@ -2861,7 +4374,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 103
+        "y": 146
       },
       "id": 332,
       "options": {
@@ -2887,7 +4400,7 @@
           "refId": "A"
         }
       ],
-      "title": "Network RX (Inbound)",
+      "title": "Containers' Network RX (Inbound)",
       "type": "timeseries"
     },
     {
@@ -2955,7 +4468,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 114
+        "y": 157
       },
       "id": 333,
       "options": {
@@ -2981,7 +4494,7 @@
           "refId": "A"
         }
       ],
-      "title": "Network TX (Outbound)",
+      "title": "Containers' Network TX (Outbound)",
       "type": "timeseries"
     },
     {
@@ -2990,7 +4503,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 125
+        "y": 168
       },
       "id": 336,
       "panels": [
@@ -3081,7 +4594,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 188
+            "y": 305
           },
           "id": 337,
           "options": {
@@ -3205,7 +4718,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 188
+            "y": 305
           },
           "id": 338,
           "options": {
@@ -3329,7 +4842,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 196
+            "y": 354
           },
           "id": 339,
           "options": {
@@ -3453,7 +4966,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 196
+            "y": 354
           },
           "id": 340,
           "options": {
@@ -3576,7 +5089,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 204
+            "y": 378
           },
           "id": 341,
           "options": {
@@ -3700,7 +5213,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 204
+            "y": 378
           },
           "id": 342,
           "options": {
@@ -3824,7 +5337,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 212
+            "y": 386
           },
           "id": 343,
           "options": {
@@ -3948,7 +5461,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 212
+            "y": 386
           },
           "id": 344,
           "options": {
@@ -3986,7 +5499,7 @@
           "type": "timeseries"
         }
       ],
-      "title": "Detailed host OS disk vitals",
+      "title": "Historical host OS disk vitals",
       "type": "row"
     },
     {
@@ -3995,7 +5508,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 126
+        "y": 169
       },
       "id": 345,
       "panels": [
@@ -4063,7 +5576,7 @@
             "h": 9,
             "w": 24,
             "x": 0,
-            "y": 189
+            "y": 306
           },
           "id": 347,
           "options": {
@@ -4160,7 +5673,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 198
+            "y": 315
           },
           "id": 348,
           "options": {
@@ -4255,7 +5768,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 198
+            "y": 315
           },
           "id": 349,
           "options": {
@@ -4350,7 +5863,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 206
+            "y": 323
           },
           "id": 351,
           "options": {
@@ -4445,7 +5958,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 206
+            "y": 323
           },
           "id": 352,
           "options": {
@@ -4540,7 +6053,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 214
+            "y": 331
           },
           "id": 353,
           "options": {
@@ -4635,7 +6148,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 214
+            "y": 331
           },
           "id": 354,
           "options": {
@@ -4730,7 +6243,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 222
+            "y": 339
           },
           "id": 350,
           "options": {
@@ -4825,7 +6338,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 222
+            "y": 339
           },
           "id": 355,
           "options": {
@@ -4855,7 +6368,7 @@
           "type": "timeseries"
         }
       ],
-      "title": "PostgreSQL DB detailed vitals",
+      "title": "Historical PostgreSQL DB vitals",
       "type": "row"
     },
     {
@@ -4864,7 +6377,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 127
+        "y": 170
       },
       "id": 356,
       "panels": [],
@@ -4922,7 +6435,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 128
+        "y": 171
       },
       "id": 357,
       "options": {
@@ -5021,7 +6534,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 128
+        "y": 171
       },
       "id": 360,
       "options": {
@@ -5122,7 +6635,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 136
+        "y": 179
       },
       "id": 358,
       "options": {
@@ -5224,7 +6737,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 136
+        "y": 179
       },
       "id": 359,
       "options": {
@@ -5326,7 +6839,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 144
+        "y": 187
       },
       "id": 361,
       "options": {
@@ -5427,7 +6940,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 144
+        "y": 187
       },
       "id": 362,
       "options": {
@@ -5474,6 +6987,995 @@
       ],
       "title": "EN server: API Error Rate",
       "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 195
+      },
+      "id": 379,
+      "panels": [],
+      "title": "Historical S3 bucket vitals",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The amount of data in bytes that is stored in a bucket. This value is calculated by summing the size of all objects and metadata (such as bucket names) in the bucket (both current and noncurrent objects), including the size of all parts for all incomplete multipart uploads to the bucket.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 196
+      },
+      "id": 380,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "StorageType": "StandardStorage"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "BucketSizeBytes",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "S3 Bucket Size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The total number of objects stored in a general purpose bucket for all storage classes. This value is calculated by counting all objects in the bucket, which includes current and noncurrent objects, delete markers, and the total number of parts for all incomplete multipart uploads to the bucket. ",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 196
+      },
+      "id": 381,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "StorageType": "*"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "NumberOfObjects",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "Total number of S3 Bucket Objects ",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "decbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 204
+      },
+      "id": 375,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "BytesDownloaded",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "Downloaded from S3 Bucket",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP GET requests made for objects in an Amazon S3 bucket. This doesn't include list operations. This metric is incremented for the source of each CopyObject request. Note: Paginated list-oriented requests, such as ListMultipartUploads, ListParts, ListObjectVersions, and others, are not included in this metric.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 204
+      },
+      "id": 383,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "GetRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "All S3 Bucket GET Requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The total number of HTTP requests made to an Amazon S3 bucket, regardless of type. ",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 212
+      },
+      "id": 384,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "AllRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "All S3 Bucket Requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "cloudwatch",
+        "uid": "aej6e4bbvfawwf"
+      },
+      "description": "The number of HTTP requests that list the contents of a bucket.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 212
+      },
+      "id": 385,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "dimensions": {
+            "BucketName": "matematikumbasic",
+            "FilterId": "AllGetRequests"
+          },
+          "expression": "",
+          "id": "",
+          "label": "",
+          "logGroups": [],
+          "matchExact": true,
+          "metricEditorMode": 0,
+          "metricName": "ListRequests",
+          "metricQueryType": 0,
+          "namespace": "AWS/S3",
+          "period": "",
+          "queryLanguage": "CWLI",
+          "queryMode": "Metrics",
+          "refId": "A",
+          "region": "default",
+          "sqlExpression": "",
+          "statistic": "Sum"
+        }
+      ],
+      "timeFrom": "30d",
+      "title": "All S3 Bucket List Requests",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 220
+      },
+      "id": 390,
+      "panels": [
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Send"
+                },
+                "properties": []
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 221
+          },
+          "id": 391,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "cloudwatch",
+                "uid": "aej6e4bbvfawwf"
+              },
+              "dimensions": {},
+              "expression": "",
+              "id": "",
+              "label": "",
+              "logGroups": [],
+              "matchExact": true,
+              "metricEditorMode": 0,
+              "metricName": "Send",
+              "metricQueryType": 0,
+              "namespace": "AWS/SES",
+              "period": "",
+              "queryLanguage": "CWLI",
+              "queryMode": "Metrics",
+              "refId": "A",
+              "region": "default",
+              "sqlExpression": "",
+              "statistic": "Average"
+            },
+            {
+              "datasource": {
+                "type": "cloudwatch",
+                "uid": "aej6e4bbvfawwf"
+              },
+              "dimensions": {},
+              "expression": "",
+              "hide": false,
+              "id": "",
+              "label": "",
+              "logGroups": [],
+              "matchExact": true,
+              "metricEditorMode": 0,
+              "metricName": "Delivery",
+              "metricQueryType": 0,
+              "namespace": "AWS/SES",
+              "period": "",
+              "queryLanguage": "CWLI",
+              "queryMode": "Metrics",
+              "refId": "B",
+              "region": "default",
+              "sqlExpression": "",
+              "statistic": "Average"
+            }
+          ],
+          "timeFrom": "1d",
+          "title": "Send/Delivery",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "cloudwatch",
+            "uid": "aej6e4bbvfawwf"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Bounce"
+                },
+                "properties": []
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 221
+          },
+          "id": 392,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "cloudwatch",
+                "uid": "aej6e4bbvfawwf"
+              },
+              "dimensions": {},
+              "expression": "",
+              "id": "",
+              "label": "",
+              "logGroups": [],
+              "matchExact": true,
+              "metricEditorMode": 0,
+              "metricName": "Bounce",
+              "metricQueryType": 0,
+              "namespace": "AWS/SES",
+              "period": "",
+              "queryLanguage": "CWLI",
+              "queryMode": "Metrics",
+              "refId": "A",
+              "region": "default",
+              "sqlExpression": "",
+              "statistic": "Average"
+            },
+            {
+              "datasource": {
+                "type": "cloudwatch",
+                "uid": "aej6e4bbvfawwf"
+              },
+              "dimensions": {},
+              "expression": "",
+              "hide": false,
+              "id": "",
+              "label": "",
+              "logGroups": [],
+              "matchExact": true,
+              "metricEditorMode": 0,
+              "metricName": "Reject",
+              "metricQueryType": 0,
+              "namespace": "AWS/SES",
+              "period": "",
+              "queryLanguage": "CWLI",
+              "queryMode": "Metrics",
+              "refId": "B",
+              "region": "default",
+              "sqlExpression": "",
+              "statistic": "Average"
+            }
+          ],
+          "timeFrom": "7d",
+          "title": "Bounce/Reject",
+          "type": "barchart"
+        }
+      ],
+      "title": "AWS SES history",
+      "type": "row"
     }
   ],
   "preload": false,
@@ -5558,5 +8060,5 @@
   "timezone": "browser",
   "title": "System Monitoring Metrics",
   "uid": "cefcm6uywi1hcf",
-  "version": 3
+  "version": 19
 }

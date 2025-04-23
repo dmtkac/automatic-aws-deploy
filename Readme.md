@@ -35,6 +35,7 @@
   - [1st part (GitHub Actions)](#GitHub-Actions-workflow)
   - [2nd part (EC2)](#ec2-part-of-workflow)
 - [Monitoring stack](#Monitoring-stack)
+  - [AWS Cloudwatch metrics in Grafana](#AWS-Cloudwatch-metrics-in-Grafana)
 - [Testing](#Testing)
     - ['frontend' container testing](#frontend-container-testing)
         - [Raw code syntax check (ESLint)](#Raw-code-syntax-check-ESLint)
@@ -450,7 +451,7 @@ Contains additional utility scripts for managing deployed infrastructure:
 ## Monitoring stack
 ([directory](./docker/monitoring_stack/))
 
-Monitoring stack of this project comprises wide variety of services, such as Prometheus, Loki, Process Exporter, Postgres Exporter and Prom-client combined with Grafana's dashboard capabilities. Overall there are 7 logical sub-dashboards:
+Monitoring stack of this project comprises wide variety of services, such as Prometheus, Loki, AWS Cloudwatch-related metrics (EC2, VPC, S3, SES ) Process Exporter, Postgres Exporter and Prom-client combined with Grafana's dashboard capabilities. Overall there are 7 logical sub-dashboards:
 
 ![All sub-dashboards collapsed](./docker/monitoring_stack/screenshots/1-all_collapsed_grafana_panels.png)
 
@@ -491,6 +492,13 @@ Monitoring stack of this project comprises wide variety of services, such as Pro
 ![Detailed Node.js metrics in web app](./docker/monitoring_stack/screenshots/10-webapp_grafana_panels.png)
 
 <p align="center"><i>Image 14. Detailed Node.js metrics in web app</i></p>
+
+### AWS Cloudwatch metrics in Grafana
+This project's custom Grafana dashboard comprises AWS metrics for Billing (charges: current quick, current detailed, historical over last 30 days), numerous S3 bucket metrics for thorough object assets monitoring and metrics for SES mailing service. They reqiure configuring separate IAM user or policy in AWS account, defining respective credentials in Grafana and adding Cloudwatch as datasource.
+
+![Detailed Node.js metrics in web app](./docker/monitoring_stack/screenshots/11-AWS_grafana_panels.png)
+
+<p align="center"><i>Image 15. AWS Billing, S3 and SES metrics</i></p>
 
 ## CI/CD pipeline
 It consists of two parts:
